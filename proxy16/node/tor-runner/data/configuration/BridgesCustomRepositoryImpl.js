@@ -489,10 +489,12 @@ class BridgesCustomRepositoryImpl extends BridgesCustomRepository {
                     return false;
                 }
 
-                const newBridges = (await this.getCustomBridgesAsync())
-                    .filter((bridge) => !bridges.includes(bridge))
-                    .concat(bridges)
-                    .sort();
+                const newBridges = [...new Set(
+                    (await this.getCustomBridgesAsync())
+                        .concat(bridges)
+                        .map((bridge) => typeof bridge === 'string' ? bridge.trim() : '')
+                        .filter(Boolean)
+                )].sort();
 
                 const saved = await this.fileManager.rewriteFileAsync(
                     this.configuration.getTorCustomBridgesPath(),
